@@ -15,7 +15,7 @@ services:
   db:
     image: jeboehm/mailserver-db:latest
     build: ./db
-    restart: on-failure:5
+    restart: unless-stopped
     env_file: .env
     volumes:
       - data-db:/var/lib/mysql
@@ -25,7 +25,7 @@ services:
   mta:
     image: jeboehm/mailserver-mta:latest
     build: ./mta
-    restart: on-failure:5
+    restart: unless-stopped
     env_file: .env
     volumes:
       - data-tls:/media/tls:ro
@@ -40,7 +40,7 @@ services:
   mda:
     image: jeboehm/mailserver-mda:latest
     build: ./mda
-    restart: on-failure:5
+    restart: unless-stopped
     env_file: .env
     volumes:
       - data-mail:/var/vmail
@@ -58,8 +58,8 @@ services:
       context: ./web
       args:
         # Roundcube plugins can be added here. See https://packagist.org/?type=roundcube-plugin
-        RC_PLUGINS: "johndoh/contextmenu jfcherng-roundcube/show-folder-size"
-    restart: on-failure:5
+        RC_PLUGINS: "johndoh/contextmenu jfcherng-roundcube/show-folder-size roundcube/customizr"
+    restart: unless-stopped
     env_file: .env
     volumes:
       - data-dkim:/media/dkim
@@ -72,7 +72,7 @@ services:
   filter:
     image: jeboehm/mailserver-filter:latest
     build: ./filter
-    restart: on-failure:5
+    restart: unless-stopped
     env_file: .env
     volumes:
       - data-filter:/var/lib/rspamd
@@ -85,28 +85,28 @@ services:
   virus:
     image: jeboehm/mailserver-virus:latest
     build: ./virus
-    restart: on-failure:5
+    restart: unless-stopped
     env_file: .env
     volumes:
       - data-virusdb:/var/lib/clamav
 
   redis:
     image: redis:7.0-alpine
-    restart: on-failure:5
+    restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - data-redis:/data
 
   # If you want unhealthy containers to be restarted automatically
   # just uncomment the following lines.
-  # autoheal:
-  #   image: willfarrell/autoheal:latest
-  #   restart: always
-  #   networks: []
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock:ro
-  #   environment:
-  #     - AUTOHEAL_CONTAINER_LABEL=de.ressourcenkonflikt.docker-mailserver.autoheal
+  autoheal:
+    image: willfarrell/autoheal:latest
+    restart: always
+    # networks: []
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=de.ressourcenkonflikt.docker-mailserver.autoheal
 
   # Optional service: extend ClamAV (used in the virus service)
   # by downloading additional databases provided by different

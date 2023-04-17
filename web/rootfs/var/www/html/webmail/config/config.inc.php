@@ -38,3 +38,5 @@ $config['smtp_conn_options'] = [
         'allow_self_signed' => true,
     ],
 ];
+$config['skin_logo'] = '/images/Logo7A.png';
+// $config['custom_watermark_image'] = '/images/Logo7A.png';

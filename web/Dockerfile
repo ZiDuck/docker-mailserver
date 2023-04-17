@@ -79,8 +79,10 @@ WORKDIR /var/www/html
 ARG RC_PLUGINS ""
 ENV RC_PLUGINS $RC_PLUGINS
 
-RUN mv /var/www/html/webmail/composer.json-dist /var/www/html/webmail/composer.json && \
-    /usr/local/bin/install_roundcube_plugins.sh
+RUN mv /var/www/html/webmail/composer.json-dist /var/www/html/webmail/composer.json
+# RUN chmod 755 /usr/local/bin/install_roundcube_plugins.sh
+RUN /usr/local/bin/install_roundcube_plugins.sh
+RUN mv /var/www/html/images/Logo7A.png /var/www/html/webmail/skins/elastic/images/
 
 HEALTHCHECK CMD curl -s http://127.0.0.1/login | grep docker-mailserver
 EXPOSE 80

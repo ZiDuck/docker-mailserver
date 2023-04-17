@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
@@ -17,7 +17,13 @@ else
     ADDITIONAL=""
 fi
 
-docker-compose \
+docker_compose="docker-compose"
+if ! command -v ${docker_compose} &> /dev/null
+then
+    docker_compose="docker compose"
+fi  
+
+${docker_compose} \
   -f docker-compose.yml \
   -f docker-compose.production.yml \
   ${ADDITIONAL} \
